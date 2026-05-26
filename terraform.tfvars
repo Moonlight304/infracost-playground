@@ -1,0 +1,7 @@
+resource_group_name = "rg-tk-idp-dev-uksouth-01"
+location            = "UK South"
+vm_name             = "int168-test-terrakube"
+vm_size             = "Standard_B2s"
+os_type             = "linux"
+admin_username      = "azureuser"
+ssh_public_key      = "ssh-rsa AAAA...your-public-key-here"
