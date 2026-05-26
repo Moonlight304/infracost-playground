@@ -17,3 +17,8 @@ output "private_ip_address" {
   description = "Private IP address of the VM NIC"
   value       = azurerm_network_interface.this.private_ip_address
 }
+
+output "private_key_path" {
+  description = "Path to the generated private key file (Linux only)"
+  value       = var.os_type == "linux" ? local_file.private_key[0].filename : null
+}

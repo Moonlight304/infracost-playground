@@ -37,14 +37,6 @@ variable "admin_username" {
   default     = "azureuser"
 }
 
-# Linux only
-variable "ssh_public_key" {
-  description = "SSH public key for Linux VM authentication"
-  type        = string
-  default     = null
-}
-
-# Windows only
 variable "admin_password" {
   description = "Admin password for Windows VM (min 12 chars, mixed case, number, special char)"
   type        = string

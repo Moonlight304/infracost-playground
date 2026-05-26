@@ -37,6 +37,18 @@ resource "azurerm_network_interface" "this" {
   }
 }
 
+resource "tls_private_key" "this" {
+  count     = var.os_type == "linux" ? 1 : 0
+  algorithm = "ED25519"
+}
+
+resource "local_file" "private_key" {
+  count           = var.os_type == "linux" ? 1 : 0
+  content         = tls_private_key.this[0].private_key_openssh
+  filename        = "${path.module}/${var.vm_name}.pem"
+  file_permission = "0600"
+}
+
 resource "azurerm_linux_virtual_machine" "this" {
   count = var.os_type == "linux" ? 1 : 0
 
@@ -50,7 +62,7 @@ resource "azurerm_linux_virtual_machine" "this" {
 
   admin_ssh_key {
     username   = var.admin_username
-    public_key = var.ssh_public_key
+    public_key = tls_private_key.this[0].public_key_openssh
   }
 
   os_disk {
