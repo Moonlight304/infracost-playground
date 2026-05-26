@@ -1,0 +1,21 @@
+# -----------------------------------------------
+# Example: Linux VM
+# -----------------------------------------------
+resource_group_name = "my-rg"
+location            = "East US"
+vm_name             = "my-linux-vm"
+vm_size             = "Standard_B2s"
+os_type             = "linux"
+admin_username      = "azureuser"
+ssh_public_key      = "ssh-rsa AAAA...your-public-key-here"
+
+# -----------------------------------------------
+# Example: Windows VM (comment out above, uncomment below)
+# -----------------------------------------------
+# resource_group_name = "my-rg"
+# location            = "East US"
+# vm_name             = "my-win-vm"
+# vm_size             = "Standard_B2s"
+# os_type             = "windows"
+# admin_username      = "azureuser"
+# admin_password      = "MyStr0ng!Password"
