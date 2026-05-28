@@ -10,7 +10,7 @@ output "vm_id" {
 
 output "resource_group_name" {
   description = "Name of the resource group"
-  value       = azurerm_resource_group.this.name
+  value       = data.azurerm_resource_group.this.name
 }
 
 output "private_ip_address" {
