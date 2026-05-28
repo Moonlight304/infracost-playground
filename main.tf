@@ -1,67 +1,67 @@
-data "azurerm_resource_group" "this" {
-  name     = var.resource_group_name
+data "azurerm_resource_group" "rg" {
+  name = var.resource_group_name
 }
 
-resource "azurerm_virtual_network" "this" {
+resource "azurerm_virtual_network" "vnet" {
   name                = "${var.vm_name}-vnet"
   address_space       = ["10.0.0.0/16"]
-  location            = data.azurerm_resource_group.this.location
-  resource_group_name = data.azurerm_resource_group.this.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
 }
 
-resource "azurerm_subnet" "this" {
+resource "azurerm_subnet" "subnet" {
   name                 = "${var.vm_name}-subnet"
-  resource_group_name  = data.azurerm_resource_group.this.name
-  virtual_network_name = azurerm_virtual_network.this.name
+  resource_group_name  = data.azurerm_resource_group.rg.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = ["10.0.1.0/24"]
 }
 
-resource "azurerm_public_ip" "this" {
+resource "azurerm_public_ip" "pip" {
   name                = "${var.vm_name}-pip"
-  location            = data.azurerm_resource_group.this.location
-  resource_group_name = data.azurerm_resource_group.this.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
   allocation_method   = "Static"
 }
 
-resource "azurerm_network_interface" "this" {
+resource "azurerm_network_interface" "nic" {
   name                = "${var.vm_name}-nic"
-  location            = data.azurerm_resource_group.this.location
-  resource_group_name = data.azurerm_resource_group.this.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = azurerm_subnet.this.id
+    subnet_id                     = azurerm_subnet.subnet.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.this.id
+    public_ip_address_id          = azurerm_public_ip.pip.id
   }
 }
 
-resource "tls_private_key" "this" {
+resource "tls_private_key" "ssh_key" {
   count     = var.os_type == "linux" ? 1 : 0
   algorithm = "ED25519"
 }
 
 resource "local_file" "private_key" {
   count           = var.os_type == "linux" ? 1 : 0
-  content         = tls_private_key.this[0].private_key_openssh
+  content         = tls_private_key.ssh_key[0].private_key_openssh
   filename        = "${path.module}/${var.vm_name}.pem"
   file_permission = "0600"
 }
 
-resource "azurerm_linux_virtual_machine" "this" {
+resource "azurerm_linux_virtual_machine" "linux_vm" {
   count = var.os_type == "linux" ? 1 : 0
 
   name                = var.vm_name
-  resource_group_name = data.azurerm_resource_group.this.name
-  location            = data.azurerm_resource_group.this.location
+  resource_group_name = data.azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
   size                = var.vm_size
   admin_username      = var.admin_username
 
-  network_interface_ids = [azurerm_network_interface.this.id]
+  network_interface_ids = [azurerm_network_interface.nic.id]
 
   admin_ssh_key {
     username   = var.admin_username
-    public_key = tls_private_key.this[0].public_key_openssh
+    public_key = tls_private_key.ssh_key[0].public_key_openssh
   }
 
   os_disk {
@@ -77,17 +77,17 @@ resource "azurerm_linux_virtual_machine" "this" {
   }
 }
 
-resource "azurerm_windows_virtual_machine" "this" {
+resource "azurerm_windows_virtual_machine" "windows_vm" {
   count = var.os_type == "windows" ? 1 : 0
 
   name                = var.vm_name
-  resource_group_name = data.azurerm_resource_group.this.name
-  location            = data.azurerm_resource_group.this.location
+  resource_group_name = data.azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
   size                = var.vm_size
   admin_username      = var.admin_username
   admin_password      = var.admin_password
 
-  network_interface_ids = [azurerm_network_interface.this.id]
+  network_interface_ids = [azurerm_network_interface.nic.id]
 
   os_disk {
     caching              = "ReadWrite"

@@ -1,21 +1,21 @@
 output "public_ip_address" {
   description = "Public IP address of the VM"
-  value       = azurerm_public_ip.this.ip_address
+  value       = azurerm_public_ip.pip.ip_address
 }
 
 output "vm_id" {
   description = "Resource ID of the VM"
-  value       = var.os_type == "linux" ? azurerm_linux_virtual_machine.this[0].id : azurerm_windows_virtual_machine.this[0].id
+  value       = var.os_type == "linux" ? azurerm_linux_virtual_machine.linux_vm[0].id : azurerm_windows_virtual_machine.windows_vm[0].id
 }
 
 output "resource_group_name" {
   description = "Name of the resource group"
-  value       = data.azurerm_resource_group.this.name
+  value       = data.azurerm_resource_group.rg.name
 }
 
 output "private_ip_address" {
   description = "Private IP address of the VM NIC"
-  value       = azurerm_network_interface.this.private_ip_address
+  value       = azurerm_network_interface.nic.private_ip_address
 }
 
 output "private_key_path" {
